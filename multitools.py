@@ -39,36 +39,38 @@ class multitools:
         file name should have the pattern of "mip_METHOD_MIDxxxxx_FIDxxxxx_*"
         '''
         for targ in self.targets:
-            print(f"    {targ}...")
-            data = "_".join(targ.split("_")[:2])  # get data_name
-            targ_img = utils.read_image(self.data_path / data / targ)
-            targ_mip = utils.get_mip(targ_img)
-            for src in self.sources:
-                if data in src:  # only run if src is a file of the data
-                    print(f"      {src}...")
-                    src_img = utils.read_image(self.data_path / data / src)
-                    src_mip = utils.get_mip(src_img)
-                    diff = utils.get_diff(targ_mip, src_mip)
-                    src_stem = utils.get_stem(src)
-                    utils.save_image(diff, self.save_path, f"diff_{src_stem}")
+            if "PAT3" in targ:
+                print(f"    {targ}...")
+                data = "_".join(targ.split("_")[:2])  # get data_name
+                targ_img = utils.read_image(self.data_path / data / targ)
+                targ_mip = utils.get_mip(targ_img)
+                for src in self.sources:
+                    if data in src:  # only run if src is a file of the data
+                        print(f"      {src}...")
+                        src_img = utils.read_image(self.data_path / data / src)
+                        src_mip = utils.get_mip(src_img)
+                        diff = utils.get_diff(targ_mip, src_mip)
+                        src_stem = utils.get_stem(src)
+                        utils.save_image(diff, self.save_path, f"diff_{src_stem}", vmax=0.1)
 
     def metrics(self):
         print("\n    - Start metrics()\n")
         for targ in self.targets:
-            targ_stem = utils.get_stem(targ)
-            print(f"    {targ_stem}...")
-            data = "_".join(targ.split("_")[:2])  # get data_name
-            targ_img = utils.read_image(self.data_path / data / targ)
-            targ_mip = utils.get_mip(targ_img)
-            for src in self.sources:
-                if data in src:  # only run if src is a file of the data
-                    print(f"      {src}...")
-                    src_img = utils.read_image(self.data_path / data / src)
-                    src_mip = utils.get_mip(src_img)
-                    psnr = utils.get_psnr(targ_mip, src_mip)
-                    ssim = utils.get_ssim(targ_mip, src_mip)
-                    src_stem = utils.get_stem(src)
-                    utils.save_image(src_mip, self.save_path, f"metrics_{src_stem}", psnr=psnr, ssim=ssim)
+            if "PAT3" in targ:
+                targ_stem = utils.get_stem(targ)
+                print(f"    {targ_stem}...")
+                data = "_".join(targ.split("_")[:2])  # get data_name
+                targ_img = utils.read_image(self.data_path / data / targ)
+                targ_mip = utils.get_mip(targ_img)
+                for src in self.sources:
+                    if data in src:  # only run if src is a file of the data
+                        print(f"      {src}...")
+                        src_img = utils.read_image(self.data_path / data / src)
+                        src_mip = utils.get_mip(src_img)
+                        psnr = utils.get_psnr(targ_mip, src_mip)
+                        ssim = utils.get_ssim(targ_mip, src_mip)
+                        src_stem = utils.get_stem(src)
+                        utils.save_image(src_mip, self.save_path, f"metrics_{src_stem}", psnr=psnr, ssim=ssim, vmax=0.5)
 
     def mip(self):
         print("\n    - Start mip()\n")
@@ -79,7 +81,7 @@ class multitools:
             data = "_".join(npy.split("_")[:2])  # get data_name
             npy_img = utils.read_image(self.data_path / data / npy)
             npy_mip = utils.get_mip(npy_img)
-            utils.save_image(npy_mip, self.save_path, f"mip_{npy_stem}", vmin=None, vmax=None)
+            utils.save_image(npy_mip, self.save_path, f"mip_{npy_stem}", vmax=0.5)
 
 
     def slice_imgs(self):
