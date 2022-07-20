@@ -3,15 +3,12 @@ import pathlib
 import matplotlib.pyplot as plt
 from argparse import ArgumentParser
 import numpy as np
-from PIL import Image
 from skimage.metrics import peak_signal_noise_ratio as PSNR
 from skimage.metrics import structural_similarity as SSIM
 
 
 def get_diff(targ, src):
     diff = src - targ
-    diff -= diff.min()
-    diff /= diff.max()
     return diff
 
 
