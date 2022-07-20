@@ -6,7 +6,7 @@
     "__data_name": [null, ["???.h5", "???.h5"]]
   },
   "programs":{
-    "mode": ["mip"],
+    "mode": [ "mip"],
     "__mode": ["diff", "metrics", "mip", "slice_imgs"]
   }
 }
