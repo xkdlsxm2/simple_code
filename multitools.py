@@ -6,7 +6,7 @@ class multitools:
         self.args = args
         self.mode = None
         self.data_path = args.data_path
-        self.targets, self.sources = utils.get_filenames(self.data_path)
+        self.targets, self.sources = utils.get_filenames(args)
         self.save_path = None
 
     def choose_mode(self, mode):
@@ -22,6 +22,9 @@ class multitools:
         elif mode == 'slice_imgs':
             self.mode = self.slice_imgs
             self.save_path = self.args.save_path / "slice_imgs"
+        elif mode == 'kspace':
+            self.mode = self.kspace
+            self.save_path = self.args.save_path / "kspace"
         else:
             raise "Mode should be one of 'diff', 'metrics', or 'mip'!"
         print("    - Selected mode:")
@@ -89,9 +92,21 @@ class multitools:
         npy_list = self.targets + self.sources
         for npy in npy_list:
             npy_stem = utils.get_stem(npy)
+            save_path  = self.save_path/ npy.split(".")[0]
             print(f"   {npy_stem}...")
             data = "_".join(npy.split("_")[:2])  # get data_name
             npy_img = utils.read_image(self.data_path / data / npy)
             for i, img in enumerate(npy_img):
-                utils.save_image(img, self.save_path/ npy.split(".")[0], f"mip_{npy_stem}_{i}", vmin=None, vmax=None)
+                utils.save_image(img, save_path, f"slice_{npy_stem}_{i}", vmin=None, vmax=None)
 
+
+    def kspace(self):
+        print("\n    - Start kspace()\n")
+        npy_list = self.targets + self.sources
+        for npy in npy_list:
+            if '_k' in npy:
+                npy_stem = utils.get_stem(npy)
+                print(f"   {npy_stem}...")
+                data = "_".join(npy.split("_")[:2])  # get data_name
+                kspace = utils.read_image(self.data_path / npy)[0]
+                utils.save_image(abs(kspace), self.save_path, f"kspace_{npy_stem}", vmin=None, vmax=None)

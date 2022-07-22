@@ -5,6 +5,7 @@ from argparse import ArgumentParser
 import numpy as np
 from skimage.metrics import peak_signal_noise_ratio as PSNR
 from skimage.metrics import structural_similarity as SSIM
+from numpy.fft import fftn, fftshift
 
 
 def get_diff(targ, src):
@@ -23,13 +24,12 @@ def save_image(image, path: pathlib.Path, name, vmin=0, vmax=1, psnr=None, ssim=
 
     path.mkdir(parents=True, exist_ok=True)
     diff_file_name = path / name
-
     plt.imshow(image, cmap='gray', vmax=vmax, vmin=vmin)
     plt.axis('off')
     if psnr:
-        plt.text(0.85*w, 0.92*h, f'{psnr:.2f} dB', color='yellow', size=25)
+        plt.text(0.85 * w, 0.92 * h, f'{psnr:.2f} dB', color='yellow', size=25)
     if ssim:
-        plt.text(0.85*w, 0.98*h, f'{ssim * 100:.2f} %', color='yellow', size=25)
+        plt.text(0.85 * w, 0.98 * h, f'{ssim * 100:.2f} %', color='yellow', size=25)
 
     figure = plt.gcf()  # get current figure
     figure.set_size_inches(28, 14)
@@ -75,16 +75,23 @@ def build_args(config_json):
     return args
 
 
-def get_filenames(path):
+def get_filenames(args):
     targets, sources = [], []
 
-    for root, dir, files in os.walk(path):
-        for file in files:
-            if "GRAPPA" in file:
-                targets.append(file)
-            else:
-                sources.append(file)
+    if len(args.data_name) == 0:
+        for root, dir, files in os.walk(args.data_path):
+            distribute_files(files, targets, sources)
+    else:
+        distribute_files(args.data_name, targets, sources)
     return targets, sources
+
+
+def distribute_files(files, targets, sources):
+    for file in files:
+        if "GRAPPA" in file:
+            targets.append(file)
+        else:
+            sources.append(file)
 
 
 def read_image(path):
@@ -103,3 +110,10 @@ def get_ssim(src, targ):
 
 def get_stem(fname):
     return fname.split(".")[0]
+
+
+def apply_fft(img, axes=None):
+    if axes is None:
+        axes = img.shape[-2:]
+
+    return fftshift(fftn(fftshift(img, axes=axes), axes=axes), axes=axes)
