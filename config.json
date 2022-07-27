@@ -1,12 +1,16 @@
 {
   "path": {
     "save_path": "C:\\Users\\z0048drc\\Desktop\\CS_recon\\Results\\MRCP\\Results\\GRAPPA(PAT3) vs CS, SSDU (PAT6)\\PF_o",
-    "data_path": "C:\\Users\\z0048drc\\Desktop\\CS_recon\\Results\\MRCP\\npys\\MID00204_FID02139",
+    "data_path": "C:\\Users\\z0048drc\\Desktop\\CS_recon\\Results\\MRCP\\npys",
     "data_name": [],
     "__data_name": [null, ["???.npy", "???.npy"]]
   },
   "programs":{
-    "mode": [ "kspace"],
+    "mode": ["diff"],
     "__mode": ["diff", "metrics", "mip", "slice_imgs", "kspace"]
-  }
+  },
+  "target_name": "GRAPPA",
+  "__target_name": "GRAPPA",
+  "target_name_pattern": "PAT3.",
+  "__target_name_pattern": "PAT3"
 }

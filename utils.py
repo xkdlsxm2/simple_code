@@ -27,9 +27,9 @@ def save_image(image, path: pathlib.Path, name, vmin=0, vmax=1, psnr=None, ssim=
     plt.imshow(image, cmap='gray', vmax=vmax, vmin=vmin)
     plt.axis('off')
     if psnr:
-        plt.text(0.85 * w, 0.92 * h, f'{psnr:.2f} dB', color='yellow', size=25)
+        plt.text(0.85 * w, 0.94 * h, psnr, color='yellow', size=30)
     if ssim:
-        plt.text(0.85 * w, 0.98 * h, f'{ssim * 100:.2f} %', color='yellow', size=25)
+        plt.text(0.85 * w, 0.98 * h, ssim, color='yellow', size=30)
 
     figure = plt.gcf()  # get current figure
     figure.set_size_inches(28, 14)
@@ -65,6 +65,18 @@ def build_args(config_json):
         default=config["mode"],
         help='Multitools mode')
 
+    parser.add_argument(
+        '--gt',
+        type=str,
+        default=config_json["target_name"],
+        help='A target name')
+
+    parser.add_argument(
+        '--pattern',
+        type=str,
+        default=config_json["target_name_pattern"],
+        help='A pattern in the target name')
+
     args = parser.parse_args()
     data_path = args.data_path
     slurm_job_id = os.environ.get('SLURM_JOB_ID')
@@ -75,24 +87,30 @@ def build_args(config_json):
     return args
 
 
-def get_filenames(args):
+def get_filenames(args, is_k=False):
     targets, sources = [], []
-
     if len(args.data_name) == 0:
         for root, dir, files in os.walk(args.data_path):
-            distribute_files(files, targets, sources)
+            root = pathlib.Path(root)
+            distribute_files(root, files, targets, sources, is_k, GT=args.gt)
     else:
-        distribute_files(args.data_name, targets, sources)
+        distribute_files(args.data_path, args.data_name, targets, sources, is_k, GT=args.gt)
     return targets, sources
 
 
-def distribute_files(files, targets, sources):
+def distribute_files(root, files, targets, sources, is_k, GT="GRAPPA"):
     for file in files:
-        if "GRAPPA" in file:
-            targets.append(file)
-        else:
-            sources.append(file)
-
+        if '.npy' in file:
+            if is_k and "_k" in file:
+                if GT in file:
+                    targets.append((root, file))
+                else:
+                    sources.append((root, file))
+            elif not is_k and "_k" not in file:
+                if GT in file:
+                    targets.append((root, file))
+                else:
+                    sources.append((root, file))
 
 def read_image(path):
     with open(path, 'rb') as f:
